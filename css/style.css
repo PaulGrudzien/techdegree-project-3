@@ -1,3 +1,5 @@
+/*Color from https://www.color-hex.com/color-palette/895*/
+
 /* ================================= 
   Base Element Styles
 ==================================== */
@@ -17,7 +19,7 @@ button {
 body {
   font: 1em/1.5;
   color: rgba(6, 49, 68, 0.9);
-	background: #CDE0FB;
+	background: white;
 }
 
 header {
@@ -40,9 +42,10 @@ a {
 
 form {
 	padding: .875em 1.875em 1.875em;
-	background: #9BBEEF;
-	border: 2px solid rgba(8, 63, 87, 0.6);
-	border-radius: 3px;
+	background: white;
+	border: 5px solid #96ceb4;
+	border-radius: 30px;
+	margin-bottom: 5px;
 }
 
 fieldset,
@@ -64,7 +67,7 @@ button {
 legend {
 	font-weight: bold;
 	padding-top: .5em;
-	border-top: 2px solid rgba(8, 63, 87, 0.6);
+	border-top: 2px solid #96ceb4;
 	margin-bottom: 1.125em;
 }
 
@@ -89,15 +92,15 @@ input {
 	font-size: 1em;
 	font-weight: 500;
 	padding: .8em;
-	background: #e9f6fb;
-	border: 2px solid rgb(111, 157, 220);
-	border-radius: 3px;
+	background: #f2f9f6;
+	border: 2px solid #96ceb4;
+	border-radius: 10px;
 	outline: none;
 }
 
 input:focus {
-	background: #fff;
-	border-color: #5e97b0;
+	background: white;
+	border-color: #96ceb4;
 	transition: border-color .4s, background-color .4s;
 }
 
@@ -107,18 +110,19 @@ input[type="radio"] {
 }
 
 button {
-	color: #fff;
+/*	color: #fff;*/
+	display: block;
 	padding: .55em 1.25em;
-	background: #083f57;
-	margin: 1.25em 0 .5em;
+	background: #f2f9f6;
+	margin: auto;
 	cursor: pointer;
-	border: 2px solid black;
-	border-radius: 4px;
+	border: 2px solid #96ceb4;
+	border-radius: 10px;
 	transition: all 0.5s;
 }
 
 button:hover {
-	background: #6F9DDC;
+	background: #8bf18b;
 }
 
 input, 
@@ -144,7 +148,7 @@ option {
 .shirt-box {
 	width: 100%;
 	padding: 5px;
-	background: rgba(255, 255, 255, 0.1);
+/*	background: rgba(255, 255, 255, 0.1);*/
 	border-radius: 4px;
 }
 
@@ -162,7 +166,7 @@ option {
 	margin-top: 10px;
 	margin-bottom: 10px;
 	padding: 5px;
-	background: rgba(255, 255, 255, 0.1);
+/*	background: rgba(255, 255, 255, 0.1);*/
 	border-radius: 4px;
 }
 
