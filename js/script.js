@@ -370,7 +370,13 @@ function validateCreditCard() {
     if (selectPayment.value != "credit card") {
         return true
     } else if (!/^[0-9]{13,16}$/.test(inputCardNumber.value)) {
-        divErrorCreditCard.textContent = "Please verify your credit card number";
+        if (!/^[0-9]+$/.test(inputCardNumber.value)) {
+            divErrorCreditCard.textContent = "Invalid card number - please enter only numbers";
+        } else if (inputCardNumber.value.length < 13) {
+            divErrorCreditCard.textContent = "Your credit card number must contain at least 13 number";
+        } else {
+            divErrorCreditCard.textContent = "Your credit card number must contain at most 16 number";
+        };
         divErrorCreditCard.style.display = "";
         inputCardNumber.focus();
         return false
