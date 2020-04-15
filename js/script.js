@@ -1,4 +1,6 @@
+const form = document.querySelector("form");
 const inputName = document.getElementById("name");
+const inputEmail = document.getElementById("mail");
 const inputOtherTitle = document.getElementById("other-title");
 const selectTitle = document.getElementById("title");
 const selectTheme = document.getElementById("design");
@@ -7,7 +9,19 @@ const selectColor = document.getElementById("color");
 const listCheckboxActivities = document.querySelectorAll("fieldset.activities input[type=checkbox]");
 const fieldsetActivities = document.querySelector("fieldset.activities");
 const pTotalCost = document.createElement("p");
+const selectPayment = document.getElementById("payment");
+const divCreditCard = document.getElementById("credit-card");
+const inputCardNumber = document.getElementById("cc-num");
+const inputZipCode = document.getElementById("zip");
+const inputCVV = document.getElementById("cvv");
+const divPaypal = document.getElementById("paypal");
+const divBitcoin = document.getElementById("bitcoin");
+const divErrorName = document.createElement("div");
+const divErrorEmail = document.createElement("div");
+const divErrorActivities = document.createElement("div");
+const divErrorCreditCard = document.createElement("div");
 
+var countActivities = 0;
 var totalCost = 0;
 
 /**
@@ -30,13 +44,45 @@ window.onload = function() {
     // add total cost paragraph
     pTotalCost.textContent = "total: $0"
     fieldsetActivities.appendChild(pTotalCost);
+    // hide "Select Payment Method", bicoin div and paypal div
+    selectPayment.firstElementChild.style.display = "none";
+    divPaypal.style.display = "none";
+    divBitcoin.style.display = "none";
+    selectPayment.children[1].selected = true;
+    // set divs for validation error's messages
+    divErrorName.textContent = "Please enter your name";
+    divErrorName.style.color = "red";
+    divErrorName.style.textAlign = "right";
+    divErrorName.style.display = "none";
+    inputName.parentNode.insertBefore(divErrorName, inputName.nextSibling);
+    divErrorEmail.textContent = "Please enter a valid email";
+    divErrorEmail.style.color = "red";
+    divErrorEmail.style.textAlign = "right";
+    divErrorEmail.style.display = "none";
+    inputEmail.parentNode.insertBefore(divErrorEmail, inputEmail.nextSibling);
+    divErrorActivities.textContent = "Please select at least one activity";
+    divErrorActivities.style.color = "red";
+    divErrorActivities.style.display = "none";
+    fieldsetActivities.insertBefore(divErrorActivities, fieldsetActivities.children[1]);
+    divErrorCreditCard.style.color = "red";
+    divErrorCreditCard.style.textAlign = "right";
+    divErrorCreditCard.style.display = "none";
+    divCreditCard.insertBefore(divErrorCreditCard, divCreditCard.children[3]);
     // set event listener
     selectTheme.addEventListener("change", updateColor);
     selectTitle.addEventListener("change", showOtherInput);
     for (let i = 0; i < listCheckboxActivities.length; i += 1) {
         listCheckboxActivities[i].addEventListener("change", checkActivity);
     };
+    selectPayment.addEventListener("change", changePaymentMethod);
+    form.addEventListener("submit", validate);
+    inputEmail.addEventListener("keyup", validateEmail);
+    inputEmail.addEventListener("change", validateEmail);
 };
+
+/* ================================= 
+  Basic Info
+==================================== */
 
 /**
  * Show a input to describe the other title (if this option is selected)
@@ -52,6 +98,10 @@ function showOtherInput(event) {
         inputOtherTitle.style.display = 'none';
     };
 };
+
+/* ================================= 
+  T-Shirt Info
+==================================== */
 
 /**
  * Update the entry of the select menu for t-shirt colors.
@@ -85,6 +135,10 @@ function updateColor(event) {
       divColor.style.display = '';
     };
 };
+
+/* ================================= 
+  Register for Activities
+==================================== */
 
 /**
  * Update the total cost of selected activities
@@ -221,8 +275,135 @@ function checkActivity(event) {
     if (activity.checked) {
         updateTotalCost(parseInt(activity.dataset.cost, 10));
         disableCompetingActivities(activity);
+        countActivities += 1;
     } else {
         updateTotalCost(-parseInt(activity.dataset.cost, 10));
         enableCompetingActivities(activity);
+        countActivities -= 1;
     };
 };
+
+/* ================================= 
+  Payment Info
+==================================== */
+
+/**
+ * Display the div concerning the selected payment method
+ *
+ * @param  {Event} event The event associated to selected payment method
+ *
+ */
+function changePaymentMethod(event) {
+    const method = event.target.value;
+    divCreditCard.style.display = "none";
+    divPaypal.style.display = "none";
+    divBitcoin.style.display = "none";
+    if (method == "credit card") {
+        divCreditCard.style.display = "";
+    } else if (method == "paypal") {
+        divPaypal.style.display = "";
+    } else if (method == "bitcoin") {
+        divBitcoin.style.display = "";
+    };
+};
+
+/* ================================= 
+  Form validation
+==================================== */
+
+/**
+ * Verify if the input Name is blank
+ *
+ * @return {boolean}    true only if the name isn't blank
+ */
+function validateName() {
+    if (inputName.value == "") {
+        divErrorName.style.display = '';
+        inputName.focus();
+        return false
+    } else {
+        divErrorName.style.display = "none";
+        return true
+    };
+};
+
+/**
+ * Verify if the input Email seems valid
+ *
+ * @param  {Event} event The event associated to typing in the Email text input.
+ *
+ * @return {boolean}     True only if the name isn't blank
+ */
+function validateEmail(event) {
+    if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(inputEmail.value)) {
+        divErrorEmail.style.display = "none";
+        return true
+    } else {
+        divErrorEmail.style.display = '';
+        inputEmail.focus();
+        return false
+    };
+};
+
+/**
+ * Verify if at least one activity is checked
+ *
+ * @return {boolean}    true only if at least one activity is checked
+ */
+function validateActivities() {
+    if (countActivities == 0) {
+        divErrorActivities.style.display = '';
+        fieldsetActivities.scrollIntoView();
+        return false
+    } else {
+        divErrorActivities.style.display = "none";
+        return true
+    };
+};
+
+/**
+ * Verify if the input Name is blank
+ *
+ * @return {boolean}    true if credit card method isn't selected or if card number, zip code and CVV seems valid.
+ */
+function validateCreditCard() {
+    if (selectPayment.value != "credit card") {
+        return true
+    } else if (!/^[0-9]{13,16}$/.test(inputCardNumber.value)) {
+        divErrorCreditCard.textContent = "Please verify your credit card number";
+        divErrorCreditCard.style.display = "";
+        inputCardNumber.focus();
+        return false
+    } else if (!/^[0-9]{5}$/.test(inputZipCode.value)) {
+        divErrorCreditCard.textContent = "Please verify your Zip Code";
+        divErrorCreditCard.style.display = "";
+        inputZipCode.focus();
+        return false
+    } else if (!/^[0-9]{3}$/.test(inputCVV.value)) {
+        divErrorCreditCard.textContent = "Please verify your CVV";
+        divErrorCreditCard.style.display = "";
+        inputCVV.focus();
+        return false
+    } else {
+        divErrorCreditCard.style.display = "none";
+        return true
+    };
+};
+
+/**
+ * Verify if the form seems valid. If the info are valid, display `info sent to server`
+ *
+ * @param  {Event}   event The event associated to submitting the form
+ *
+ */
+function validate(event) {
+    event.preventDefault();
+    const valid = validateName() &&
+                  validateEmail() && 
+                  validateActivities() &&
+                  validateCreditCard();
+    if (valid) {
+        document.querySelector("body").innerHTML = "This data seems valid <br/> send info to server";
+    };
+};
+
