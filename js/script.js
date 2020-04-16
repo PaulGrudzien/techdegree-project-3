@@ -20,6 +20,9 @@ const divErrorName = document.createElement("div");
 const divErrorEmail = document.createElement("div");
 const divErrorActivities = document.createElement("div");
 const divErrorCreditCard = document.createElement("div");
+const pErrorCardNumber = document.createElement("p");
+const pErrorZipCode = document.createElement("p");
+const pErrorCVV = document.createElement("p");
 
 var countActivities = 0;
 var totalCost = 0;
@@ -42,7 +45,7 @@ window.onload = function() {
     selectColor.innerHTML = '<option value="" selected disabled hidden>Select Color</option>' + selectColor.innerHTML;
     divColor.style.display = 'none';
     // add total cost paragraph
-    pTotalCost.textContent = "total: $0"
+    pTotalCost.textContent = "total: $0";
     fieldsetActivities.appendChild(pTotalCost);
     // hide "Select Payment Method", bicoin div and paypal div
     selectPayment.firstElementChild.style.display = "none";
@@ -68,6 +71,9 @@ window.onload = function() {
     divErrorCreditCard.style.textAlign = "right";
     divErrorCreditCard.style.display = "none";
     divCreditCard.insertBefore(divErrorCreditCard, divCreditCard.children[3]);
+    divErrorCreditCard.appendChild(pErrorCardNumber);
+    divErrorCreditCard.appendChild(pErrorZipCode);
+    divErrorCreditCard.appendChild(pErrorCVV);
     // set event listener
     selectTheme.addEventListener("change", updateColor);
     selectTitle.addEventListener("change", showOtherInput);
@@ -160,9 +166,9 @@ function updateTotalCost(cost) {
  */
 function getActivityDay(activity) {
     if (activity.dataset.dayAndTime) {
-        return activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$1")
+        return activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$1");
     } else {
-        return ""
+        return "";
     }
 };
 
@@ -177,8 +183,8 @@ function getActivityStartHour(activity) {
     var startHour = 0;
     var amOrPm = "am";
     if (activity.dataset.dayAndTime) {
-         startHour = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$2")
-         amOrPm = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$3")
+         startHour = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$2");
+         amOrPm = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$3");
     };
     startHour = parseInt(startHour, 10);
     if (amOrPm == "pm" && startHour != 12) {
@@ -198,8 +204,8 @@ function getActivityEndHour(activity) {
     var endHour = 0;
     var amOrPm = "am";
     if (activity.dataset.dayAndTime) {
-         endHour = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$4")
-         amOrPm = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$5")
+         endHour = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$4");
+         amOrPm = activity.dataset.dayAndTime.replace(/(\w+) (\d+)(\w{2}).(\d+)(\w{2})/, "$5");
     };
     endHour = parseInt(endHour, 10);
     if (amOrPm == "pm" && endHour != 12) {
@@ -226,7 +232,7 @@ function findCompetingActivities(activity) {
         } else if (getActivityDay(activity) == getActivityDay(otherActivity) &&
             getActivityStartHour(otherActivity) <= getActivityEndHour(activity) &&
             getActivityEndHour(otherActivity) >= getActivityStartHour(activity)) {
-                 listCompetingActivities.push(otherActivity)
+                 listCompetingActivities.push(otherActivity);
         };
     };
     return listCompetingActivities;
@@ -319,11 +325,13 @@ function changePaymentMethod(event) {
 function validateName() {
     if (inputName.value == "") {
         divErrorName.style.display = '';
+        inputName.style.border="4px solid red";
         inputName.focus();
-        return false
+        return false;
     } else {
         divErrorName.style.display = "none";
-        return true
+        inputName.style.border="";
+        return true;
     };
 };
 
@@ -337,11 +345,13 @@ function validateName() {
 function validateEmail(event) {
     if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(inputEmail.value)) {
         divErrorEmail.style.display = "none";
-        return true
+        inputEmail.style.border="";
+        return true;
     } else {
         divErrorEmail.style.display = '';
+        inputEmail.style.border="4px solid red";
         inputEmail.focus();
-        return false
+        return false;
     };
 };
 
@@ -354,10 +364,10 @@ function validateActivities() {
     if (countActivities == 0) {
         divErrorActivities.style.display = '';
         fieldsetActivities.scrollIntoView();
-        return false
+        return false;
     } else {
         divErrorActivities.style.display = "none";
-        return true
+        return true;
     };
 };
 
@@ -367,33 +377,55 @@ function validateActivities() {
  * @return {boolean}    true if credit card method isn't selected or if card number, zip code and CVV seems valid.
  */
 function validateCreditCard() {
-    if (selectPayment.value != "credit card") {
-        return true
-    } else if (!/^[0-9]{13,16}$/.test(inputCardNumber.value)) {
-        if (!/^[0-9]+$/.test(inputCardNumber.value)) {
-            divErrorCreditCard.textContent = "Invalid card number - please enter only numbers";
+    var isValid = true;
+    // Check credit card number format
+    if (!/^[0-9]{13,16}$/.test(inputCardNumber.value)) {
+        if (inputCardNumber.value == "") {
+            pErrorCardNumber.textContent = "Please enter your card number";
+        } else if (!/^[0-9]+$/.test(inputCardNumber.value)) {
+            pErrorCardNumber.textContent = "Invalid card number - please enter only numbers";
         } else if (inputCardNumber.value.length < 13) {
-            divErrorCreditCard.textContent = "Your credit card number must contain at least 13 number";
+            pErrorCardNumber.textContent = "Your credit card number must contain at least 13 number";
         } else {
-            divErrorCreditCard.textContent = "Your credit card number must contain at most 16 number";
+            pErrorCardNumber.textContent = "Your credit card number must contain at most 16 number";
         };
         divErrorCreditCard.style.display = "";
+        pErrorCardNumber.style.display = "";
+        inputCardNumber.style.border="4px solid red";
         inputCardNumber.focus();
-        return false
-    } else if (!/^[0-9]{5}$/.test(inputZipCode.value)) {
-        divErrorCreditCard.textContent = "Please verify your Zip Code";
-        divErrorCreditCard.style.display = "";
-        inputZipCode.focus();
-        return false
-    } else if (!/^[0-9]{3}$/.test(inputCVV.value)) {
-        divErrorCreditCard.textContent = "Please verify your CVV";
-        divErrorCreditCard.style.display = "";
-        inputCVV.focus();
-        return false
+        isValid = false;
     } else {
-        divErrorCreditCard.style.display = "none";
-        return true
+        inputCardNumber.style.border="";
+        pErrorCardNumber.style.display = "none";
     };
+    // Check ZipCode format
+    if (!/^[0-9]{5}$/.test(inputZipCode.value)) {
+        pErrorZipCode.textContent = "Please verify your Zip Code";
+        divErrorCreditCard.style.display = "";
+        pErrorZipCode.style.display = "";
+        inputZipCode.style.border="4px solid red";
+        inputZipCode.focus();
+        isValid = false;
+    } else {
+        inputZipCode.style.border="";
+        pErrorZipCode.style.display = "none";
+    };
+    // Check CVV format
+    if (!/^[0-9]{3}$/.test(inputCVV.value)) {
+        pErrorCVV.textContent = "Please verify your CVV";
+        divErrorCreditCard.style.display = "";
+        pErrorCVV.style.display = "";
+        inputCVV.style.border="4px solid red";
+        inputCVV.focus();
+        isValid = false;
+    } else {
+        inputCVV.style.border="";
+        pErrorCVV.style.display = "none";
+    };
+    if (isValid) {
+        divErrorCreditCard.style.display = "none";
+    };
+    return isValid;
 };
 
 /**
@@ -403,13 +435,16 @@ function validateCreditCard() {
  *
  */
 function validate(event) {
-    event.preventDefault();
-    const valid = validateName() &&
-                  validateEmail() && 
-                  validateActivities() &&
-                  validateCreditCard();
-    if (valid) {
-        document.querySelector("body").innerHTML = "This data seems valid <br/> send info to server";
+    var goodCreditCard = true;
+    if (selectPayment.value == "credit card") {
+        goodCreditCard = validateCreditCard();
+    };
+    const goodActivities = validateActivities();
+    const goodEmail = validateEmail();
+    const goodName = validateName();
+    const isValid = goodName && goodEmail && goodActivities && goodCreditCard;
+    if (!isValid) {
+        event.preventDefault();
     };
 };
 
